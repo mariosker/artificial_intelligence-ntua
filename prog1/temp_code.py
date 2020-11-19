@@ -27,7 +27,7 @@ class grid:
 
         ## Start and end position have no obstacles
         self.grid[S] = 0
-        # self.grid[F]=0
+        self.grid[F] = 0
         obstacle_free_points = {S, F}
 
         ### YOUR CODE HERE
@@ -62,6 +62,14 @@ class grid:
                 self.grid[(cell_y, cell_x - 1)] = 0
                 add_walls((cell_y, cell_x - 1), walls)
                 return True
+            elif (cell_x - 1 > 0 and cell_x + 1 < self.N
+                  and (cell_y, cell_x - 1) in obstacle_free_points):
+                self.grid[(cell_y, cell_x)] = 0
+                return True
+            elif (cell_x - 1 > 0 and cell_x + 1 < self.N
+                  and (cell_y, cell_x + 1) in obstacle_free_points):
+                self.grid[(cell_y, cell_x)] = 0
+                return True
             return False
 
         def neighbors_in_y_axis(coords, walls):
@@ -83,9 +91,18 @@ class grid:
                 self.grid[(cell_y - 1, cell_x)] = 0
                 add_walls((cell_y - 1, cell_x), walls)
                 return True
+
+            elif (cell_y - 1 > 0 and cell_y + 1 < self.N
+                  and (cell_y - 1, cell_x) in obstacle_free_points):
+                self.grid[(cell_y, cell_x)] = 0
+                return True
+            elif (cell_y - 1 > 0 and cell_y + 1 < self.N
+                  and (cell_y + 1, cell_x) in obstacle_free_points):
+                self.grid[(cell_y, cell_x)] = 0
+                return True
             return False
 
-        def solution():
+        def create_maze():
             walls = []
 
             add_walls(S, walls)
@@ -100,7 +117,7 @@ class grid:
                 neighbors_in_x_axis((cell_y, cell_x), walls)
                 neighbors_in_y_axis((cell_y, cell_x), walls)
 
-        solution()
+        create_maze()
 
     def draw_map(self, S=None, F=None, path=None):
         image = np.zeros((self.N, self.N, 3), dtype=int)
