@@ -31,6 +31,18 @@ class grid:
         obstacle_free_points = {S, F}
 
         ### YOUR CODE HERE
+        def is_obstructed(coords):
+            (y, x) = coords
+            if y - 1 > 0 and self.grid[(y - 1, x)] == 0:
+                return False
+            if y + 1 < self.N and self.grid[(y + 1, x)] == 1:
+                return False
+            if x - 1 > 0 and self.grid[(y, x - 1)] == 1:
+                return False
+            if x + 1 < self.N and self.grid[(y, x + 1)] == 1:
+                return False
+            return True
+
         def add_walls(coords, walls):
             (y, x) = coords
 
@@ -62,14 +74,19 @@ class grid:
                 self.grid[(cell_y, cell_x - 1)] = 0
                 add_walls((cell_y, cell_x - 1), walls)
                 return True
+
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N
-                  and (cell_y, cell_x - 1) in obstacle_free_points):
+                  and (cell_y, cell_x - 1) in obstacle_free_points
+                  and is_obstructed((cell_y, cell_x - 1))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
+
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N
-                  and (cell_y, cell_x + 1) in obstacle_free_points):
+                  and (cell_y, cell_x + 1) in obstacle_free_points
+                  and is_obstructed((cell_y, cell_x + 1))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
+
             return False
 
         def neighbors_in_y_axis(coords, walls):
@@ -93,13 +110,17 @@ class grid:
                 return True
 
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N
-                  and (cell_y - 1, cell_x) in obstacle_free_points):
+                  and (cell_y - 1, cell_x) in obstacle_free_points
+                  and is_obstructed((cell_y - 1, cell_x))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
+
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N
-                  and (cell_y + 1, cell_x) in obstacle_free_points):
+                  and (cell_y + 1, cell_x) in obstacle_free_points
+                  and is_obstructed((cell_y + 1, cell_x))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
+
             return False
 
         def create_maze():
