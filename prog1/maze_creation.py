@@ -1,4 +1,4 @@
-# %matplotlib inline
+%matplotlib inline
 import numpy as np
 from queue import LifoQueue
 from random import shuffle, uniform
