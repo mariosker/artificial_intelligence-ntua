@@ -1,7 +1,7 @@
 # %matplotlib inline
 import numpy as np
 from queue import LifoQueue
-from random import choice, shuffle, uniform
+from random import shuffle, uniform
 import matplotlib.pyplot as plt
 from numpy.core.fromnumeric import choose
 
@@ -31,18 +31,6 @@ class grid:
         obstacle_free_points = {S, F}
 
         ### YOUR CODE HERE
-        def is_obstructed(coords):
-            (y, x) = coords
-            if y - 1 > 0 and self.grid[(y - 1, x)] == 0:
-                return False
-            if y + 1 < self.N and self.grid[(y + 1, x)] == 1:
-                return False
-            if x - 1 > 0 and self.grid[(y, x - 1)] == 1:
-                return False
-            if x + 1 < self.N and self.grid[(y, x + 1)] == 1:
-                return False
-            return True
-
         def add_walls(coords, walls):
             (y, x) = coords
 
@@ -54,6 +42,18 @@ class grid:
                 walls.append((y, x - 1))
             if x + 1 < self.N and self.grid[(y, x + 1)] == 1:
                 walls.append((y, x + 1))
+
+        def is_cell_obstructed(coords):
+            (y, x) = coords
+            if y - 1 > 0 and self.grid[(y - 1, x)] == 0:
+                return False
+            if y + 1 < self.N and self.grid[(y + 1, x)] == 0:
+                return False
+            if x - 1 > 0 and self.grid[(y, x - 1)] == 0:
+                return False
+            if x + 1 < self.N and self.grid[(y, x + 1)] == 0:
+                return False
+            return True
 
         def neighbors_in_x_axis(coords, walls):
             (cell_y, cell_x) = coords
@@ -77,13 +77,13 @@ class grid:
 
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N
                   and (cell_y, cell_x - 1) in obstacle_free_points
-                  and is_obstructed((cell_y, cell_x - 1))):
+                  and is_cell_obstructed((cell_y, cell_x - 1))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N
                   and (cell_y, cell_x + 1) in obstacle_free_points
-                  and is_obstructed((cell_y, cell_x + 1))):
+                  and is_cell_obstructed((cell_y, cell_x + 1))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
@@ -111,19 +111,19 @@ class grid:
 
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N
                   and (cell_y - 1, cell_x) in obstacle_free_points
-                  and is_obstructed((cell_y - 1, cell_x))):
+                  and is_cell_obstructed((cell_y - 1, cell_x))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N
                   and (cell_y + 1, cell_x) in obstacle_free_points
-                  and is_obstructed((cell_y + 1, cell_x))):
+                  and is_cell_obstructed((cell_y + 1, cell_x))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
             return False
 
-        def create_maze():
+        def generate_maze():
             walls = []
 
             add_walls(S, walls)
@@ -138,7 +138,7 @@ class grid:
                 neighbors_in_x_axis((cell_y, cell_x), walls)
                 neighbors_in_y_axis((cell_y, cell_x), walls)
 
-        create_maze()
+        generate_maze()
 
     def draw_map(self, S=None, F=None, path=None):
         image = np.zeros((self.N, self.N, 3), dtype=int)
