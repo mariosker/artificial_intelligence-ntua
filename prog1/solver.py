@@ -1,7 +1,6 @@
 # from visualization import *
 import math
 
-
 class pathfinder:
     def __init__(self, S, F, grid, c, h):
         self.S = S
@@ -26,13 +25,13 @@ class pathfinder:
     def find_frontier(self, coords):
         frontier = []
         (y,x) = coords
-        if(self.grid((y,x-1)) != 1):
+        if(x-1 > 0 and self.grid((y,x-1)) != 1):
             frontier.append((y,x-1))
-        if(self.grid((y,x+1)) != 1):
+        if(x+1 < self.N and self.grid((y,x+1)) != 1):
             frontier.append((y,x+1))
-        if(self.grid((y-1,x)) != 1):
+        if(y-1 > 0 and self.grid((y-1,x)) != 1):
             frontier.append((y-1,x))
-        if(self.grid((y+1,x)) != 1):
+        if(y+1 < self.N and self.grid((y+1,x)) != 1):
             frontier.append((y+1,x))
         return frontier
 
@@ -42,5 +41,8 @@ class pathfinder:
         expanded_nodes = []
 
         while frontier:
+            frontier.extend(find_frontier(coords))
+
+
     def get_path(self):
         return self.path
