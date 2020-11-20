@@ -338,3 +338,8 @@ F = (95, 85)
 map = grid(N, S, F)
 pf = pathfinder(S, F, map, lambda x, y: 1, lambda x, y: 0)
 map.draw_map(S, F, pf.get_path())
+pf.vis.add_path(pf.get_path())
+
+#καλούμε την μέθοδο για να παρουσιάσουμε το animation στο Notebook
+# pf.vis.save_gif("mygif.gif")
+pf.vis.show_gif(fps = 1)
