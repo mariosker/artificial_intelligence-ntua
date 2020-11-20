@@ -10,6 +10,7 @@ from numpy.core.fromnumeric import choose
 
 
 class visualization:
+
     def __init__(self, S, F):
         '''
           Η μέθοδος αυτή αρχικοποιεί ένα αντικείμενο τύπου visualization.
@@ -61,19 +62,14 @@ class visualization:
 
     def create_gif(self, fps=30, repeat_delay=2000):
         if len(self.images) == 0:
-            raise EmptyStackOfImages(
-                "Error! You have to call 'draw_step' at  first.")
+            raise EmptyStackOfImages("Error! You have to call 'draw_step' at  first.")
         fig = plt.figure()
         plt.axis('off')
         ims = []
         for img in self.images:
             img = plt.imshow(img)
             ims.append([img])
-        ani = animation.ArtistAnimation(fig,
-                                        ims,
-                                        interval=1000 // fps,
-                                        blit=True,
-                                        repeat_delay=repeat_delay)
+        ani = animation.ArtistAnimation(fig, ims, interval=1000 // fps, blit=True, repeat_delay=repeat_delay)
         plt.close(fig)
         return ani
 
@@ -108,8 +104,7 @@ class visualization:
             Exceptions: EmptyStackOfImages αν το animation δεν έχει ούτε ένα frame, δηλαδή αν η draw_step δεν έχει καλεστεί ποτέ.
         '''
         if len(self.images) == 0:
-            raise EmptyStackOfImages(
-                "Error! You have to call 'draw_step' at  first.")
+            raise EmptyStackOfImages("Error! You have to call 'draw_step' at  first.")
         else:
             plt.imshow(self.images[-1])
 
@@ -119,6 +114,7 @@ class EmptyStackOfImages(Exception):
 
 
 class grid:
+
     def __init__(self, N, S, F):
         ## Make sure start and end are within the grid
         assert N > 2
@@ -169,33 +165,29 @@ class grid:
 
         def neighbors_in_x_axis(coords, walls):
             (cell_y, cell_x) = coords
-            if (cell_x - 1 > 0 and cell_x + 1 < self.N
-                    and self.grid[(cell_y, cell_x - 1)] == 0
-                    and self.grid[(cell_y, cell_x + 1)] == 1):
+            if (cell_x - 1 > 0 and cell_x + 1 < self.N and self.grid[(cell_y, cell_x - 1)] == 0 and
+                    self.grid[(cell_y, cell_x + 1)] == 1):
                 self.grid[(cell_y, cell_x)] = 0
 
                 self.grid[(cell_y, cell_x + 1)] = 0
                 add_walls((cell_y, cell_x + 1), walls)
                 return True
 
-            elif (cell_x - 1 > 0 and cell_x + 1 < self.N
-                  and self.grid[(cell_y, cell_x - 1)] == 1
-                  and self.grid[(cell_y, cell_x + 1)] == 0):
+            elif (cell_x - 1 > 0 and cell_x + 1 < self.N and self.grid[(cell_y, cell_x - 1)] == 1 and
+                  self.grid[(cell_y, cell_x + 1)] == 0):
                 self.grid[(cell_y, cell_x)] = 0
 
                 self.grid[(cell_y, cell_x - 1)] = 0
                 add_walls((cell_y, cell_x - 1), walls)
                 return True
 
-            elif (cell_x - 1 > 0 and cell_x + 1 < self.N
-                  and (cell_y, cell_x - 1) in obstacle_free_points
-                  and is_cell_obstructed((cell_y, cell_x - 1))):
+            elif (cell_x - 1 > 0 and cell_x + 1 < self.N and (cell_y, cell_x - 1) in obstacle_free_points and
+                  is_cell_obstructed((cell_y, cell_x - 1))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
-            elif (cell_x - 1 > 0 and cell_x + 1 < self.N
-                  and (cell_y, cell_x + 1) in obstacle_free_points
-                  and is_cell_obstructed((cell_y, cell_x + 1))):
+            elif (cell_x - 1 > 0 and cell_x + 1 < self.N and (cell_y, cell_x + 1) in obstacle_free_points and
+                  is_cell_obstructed((cell_y, cell_x + 1))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
@@ -203,33 +195,29 @@ class grid:
 
         def neighbors_in_y_axis(coords, walls):
             (cell_y, cell_x) = coords
-            if (cell_y - 1 > 0 and cell_y + 1 < self.N
-                    and self.grid[(cell_y - 1, cell_x)] == 0
-                    and self.grid[(cell_y + 1, cell_x)] == 1):
+            if (cell_y - 1 > 0 and cell_y + 1 < self.N and self.grid[(cell_y - 1, cell_x)] == 0 and
+                    self.grid[(cell_y + 1, cell_x)] == 1):
                 self.grid[(cell_y, cell_x)] = 0
 
                 self.grid[(cell_y + 1, cell_x)] = 0
                 add_walls((cell_y + 1, cell_x), walls)
                 return True
 
-            elif (cell_y - 1 > 0 and cell_y + 1 < self.N
-                  and self.grid[(cell_y - 1, cell_x)] == 1
-                  and self.grid[(cell_y + 1, cell_x)] == 0):
+            elif (cell_y - 1 > 0 and cell_y + 1 < self.N and self.grid[(cell_y - 1, cell_x)] == 1 and
+                  self.grid[(cell_y + 1, cell_x)] == 0):
                 self.grid[(cell_y, cell_x)] = 0
 
                 self.grid[(cell_y - 1, cell_x)] = 0
                 add_walls((cell_y - 1, cell_x), walls)
                 return True
 
-            elif (cell_y - 1 > 0 and cell_y + 1 < self.N
-                  and (cell_y - 1, cell_x) in obstacle_free_points
-                  and is_cell_obstructed((cell_y - 1, cell_x))):
+            elif (cell_y - 1 > 0 and cell_y + 1 < self.N and (cell_y - 1, cell_x) in obstacle_free_points and
+                  is_cell_obstructed((cell_y - 1, cell_x))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
-            elif (cell_y - 1 > 0 and cell_y + 1 < self.N
-                  and (cell_y + 1, cell_x) in obstacle_free_points
-                  and is_cell_obstructed((cell_y + 1, cell_x))):
+            elif (cell_y - 1 > 0 and cell_y + 1 < self.N and (cell_y + 1, cell_x) in obstacle_free_points and
+                  is_cell_obstructed((cell_y + 1, cell_x))):
                 self.grid[(cell_y, cell_x)] = 0
                 return True
 
@@ -269,7 +257,9 @@ class grid:
         plt.yticks([])
         plt.show()
 
+
 class pathfinder:
+
     def __init__(self, S, F, grid, c, h):
         self.S = S
         self.F = F
@@ -280,7 +270,7 @@ class pathfinder:
         self.vis = visualization(S, F)
         self.path = []
 
-    def manhattan(self, start_coords,end_coords):
+    def manhattan(self, start_coords, end_coords):
         (sy, sx) = start_coords
         (fy, fx) = end_coords
         return (abs(sx - fx) + abs(sy - fy)) * self.heuristic(sy, fy)
@@ -288,10 +278,10 @@ class pathfinder:
     def euclidean(self, start_coords, end_coords):
         (sy, sx) = start_coords
         (fy, fx) = end_coords
-        return np.sqrt(((sx - fx) * self.heuristic(sx, fx))**2 +
-                       ((sy - fy) * self.heuristic(sy, fy))**2)
+        return np.sqrt(((sx - fx) * self.heuristic(sx, fx))**2 + ((sy - fy) * self.heuristic(sy, fy))**2)
 
     def find_path(self, heuristic_fun):
+
         def get_neighbors(coords):
             neighbors = []
             (y, x) = coords
@@ -305,38 +295,36 @@ class pathfinder:
                 neighbors.append((y + 1, x))
             return neighbors
 
-        close_set = set()
-        came_from = {}
-        gscore = {self.S: 0}
-        fscore = {self.S: heuristic_fun(self.S, self.F)}
-        heap = [(fscore[self.S], self.S)]
+        g_score = {self.S: 0}
+        f_score = {self.S: heuristic_fun(self.S, self.F)}
+        frontier = [(f_score[self.S], self.S)]
+        expanded_nodes = set()
+        parent = {}
 
-        while heap:
-            heap.sort(key=lambda x: x[0], reverse=True)
-            current = (heap.pop())[1]
+        while frontier:
+            frontier.sort(key=lambda x: x[0], reverse=True)
+            current = frontier.pop()[1]
 
             if current == self.F:
-                while current in came_from:
+                while current in parent:
                     self.path.append(current)
-                    current = came_from[current]
+                    current = parent[current]
+                self.path.append(current)
                 return True
 
-            close_set.add(current)
+            expanded_nodes.add(current)
 
             for neighbor in get_neighbors(current):
-                tentative_g_score = gscore[current] + heuristic_fun(current, neighbor)
+                tentative_g_score = g_score[current] + heuristic_fun(current, neighbor)
 
-                if neighbor in close_set and tentative_g_score >= gscore.get(
-                        neighbor, 0):
+                if neighbor in expanded_nodes and tentative_g_score >= g_score.get(neighbor, 0):
                     continue
-                if tentative_g_score < gscore.get(
-                        neighbor, 0) or neighbor not in [i[1] for i in heap]:
-                    came_from[neighbor] = current
-                    gscore[neighbor] = tentative_g_score
-                    fscore[neighbor] = tentative_g_score + heuristic_fun(
-                        neighbor, self.F)
-                    heap.append((fscore[neighbor], neighbor))
-             pf.vis.draw_step(map,  [i[1] for i in heap], close_set)
+                if tentative_g_score < g_score.get(neighbor, 0) or neighbor not in [i[1] for i in frontier]:
+                    parent[neighbor] = current
+                    g_score[neighbor] = tentative_g_score
+                    f_score[neighbor] = tentative_g_score + heuristic_fun(neighbor, self.F)
+                    frontier.append((f_score[neighbor], neighbor))
+            pf.vis.draw_step(map, [i[1] for i in frontier], expanded_nodes)
         return False
 
     def get_path(self):
