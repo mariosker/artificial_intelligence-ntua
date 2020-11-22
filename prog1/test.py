@@ -1,12 +1,12 @@
-# import math
 from queue import LifoQueue
-from random import shuffle, uniform
+from random import betavariate, shuffle, uniform
+import random
+import matplotlib
 import matplotlib.animation as animation
 import matplotlib.pyplot as plt
 import numpy as np
 from IPython.display import HTML
 from matplotlib.animation import PillowWriter
-from numpy.core.fromnumeric import choose
 
 
 class visualization:
@@ -113,9 +113,12 @@ class EmptyStackOfImages(Exception):
     pass
 
 
+# -----------------------------------------------------------------------------
+
+
 class grid:
 
-    def __init__(self, N, S, F):
+    def __init__(self, N, S, F, distribution):
         ## Make sure start and end are within the grid
         assert N > 2
         assert S[0] < N
@@ -129,6 +132,7 @@ class grid:
         assert F[1] > 0
 
         self.N = N
+        self.distribution = distribution
 
         ## Initialize grid with obstacles
         self.grid = np.ones((N, N), dtype=np.int32)
@@ -153,72 +157,72 @@ class grid:
 
         def is_cell_obstructed(coords):
             (y, x) = coords
-            if y - 1 > 0 and self.grid[(y - 1, x)] == 0:
+            if y - 1 > 0 and self.grid[(y - 1, x)] != 1:
                 return False
-            if y + 1 < self.N and self.grid[(y + 1, x)] == 0:
+            if y + 1 < self.N and self.grid[(y + 1, x)] != 1:
                 return False
-            if x - 1 > 0 and self.grid[(y, x - 1)] == 0:
+            if x - 1 > 0 and self.grid[(y, x - 1)] != 1:
                 return False
-            if x + 1 < self.N and self.grid[(y, x + 1)] == 0:
+            if x + 1 < self.N and self.grid[(y, x + 1)] != 1:
                 return False
             return True
 
         def neighbors_in_x_axis(coords, walls):
             (cell_y, cell_x) = coords
-            if (cell_x - 1 > 0 and cell_x + 1 < self.N and self.grid[(cell_y, cell_x - 1)] == 0 and
+            if (cell_x - 1 > 0 and cell_x + 1 < self.N and self.grid[(cell_y, cell_x - 1)] != 1 and
                     self.grid[(cell_y, cell_x + 1)] == 1):
-                self.grid[(cell_y, cell_x)] = 0
+                self.grid[(cell_y, cell_x)] = self.distribution()
 
-                self.grid[(cell_y, cell_x + 1)] = 0
+                self.grid[(cell_y, cell_x + 1)] = self.distribution()
                 add_walls((cell_y, cell_x + 1), walls)
                 return True
 
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N and self.grid[(cell_y, cell_x - 1)] == 1 and
-                  self.grid[(cell_y, cell_x + 1)] == 0):
-                self.grid[(cell_y, cell_x)] = 0
+                  self.grid[(cell_y, cell_x + 1)] != 1):
+                self.grid[(cell_y, cell_x)] = self.distribution()
 
-                self.grid[(cell_y, cell_x - 1)] = 0
+                self.grid[(cell_y, cell_x - 1)] = self.distribution()
                 add_walls((cell_y, cell_x - 1), walls)
                 return True
 
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N and (cell_y, cell_x - 1) in obstacle_free_points and
                   is_cell_obstructed((cell_y, cell_x - 1))):
-                self.grid[(cell_y, cell_x)] = 0
+                self.grid[(cell_y, cell_x)] = self.distribution()
                 return True
 
             elif (cell_x - 1 > 0 and cell_x + 1 < self.N and (cell_y, cell_x + 1) in obstacle_free_points and
                   is_cell_obstructed((cell_y, cell_x + 1))):
-                self.grid[(cell_y, cell_x)] = 0
+                self.grid[(cell_y, cell_x)] = self.distribution()
                 return True
 
             return False
 
         def neighbors_in_y_axis(coords, walls):
             (cell_y, cell_x) = coords
-            if (cell_y - 1 > 0 and cell_y + 1 < self.N and self.grid[(cell_y - 1, cell_x)] == 0 and
+            if (cell_y - 1 > 0 and cell_y + 1 < self.N and self.grid[(cell_y - 1, cell_x)] != 1 and
                     self.grid[(cell_y + 1, cell_x)] == 1):
-                self.grid[(cell_y, cell_x)] = 0
+                self.grid[(cell_y, cell_x)] = self.distribution()
 
-                self.grid[(cell_y + 1, cell_x)] = 0
+                self.grid[(cell_y + 1, cell_x)] = self.distribution()
                 add_walls((cell_y + 1, cell_x), walls)
                 return True
 
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N and self.grid[(cell_y - 1, cell_x)] == 1 and
-                  self.grid[(cell_y + 1, cell_x)] == 0):
-                self.grid[(cell_y, cell_x)] = 0
+                  self.grid[(cell_y + 1, cell_x)] != 1):
+                self.grid[(cell_y, cell_x)] = self.distribution()
 
-                self.grid[(cell_y - 1, cell_x)] = 0
+                self.grid[(cell_y - 1, cell_x)] = self.distribution()
                 add_walls((cell_y - 1, cell_x), walls)
                 return True
 
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N and (cell_y - 1, cell_x) in obstacle_free_points and
                   is_cell_obstructed((cell_y - 1, cell_x))):
-                self.grid[(cell_y, cell_x)] = 0
+                self.grid[(cell_y, cell_x)] = self.distribution()
                 return True
 
             elif (cell_y - 1 > 0 and cell_y + 1 < self.N and (cell_y + 1, cell_x) in obstacle_free_points and
                   is_cell_obstructed((cell_y + 1, cell_x))):
-                self.grid[(cell_y, cell_x)] = 0
+                self.grid[(cell_y, cell_x)] = self.distribution()
                 return True
 
             return False
@@ -232,7 +236,7 @@ class grid:
                 shuffle(walls)
                 (cell_y, cell_x) = walls.pop()
 
-                if self.grid[(cell_y, cell_x)] == 0:
+                if self.grid[(cell_y, cell_x)] != 1:
                     continue
 
                 neighbors_in_x_axis((cell_y, cell_x), walls)
@@ -242,7 +246,7 @@ class grid:
 
     def draw_map(self, S=None, F=None, path=None):
         image = np.zeros((self.N, self.N, 3), dtype=int)
-        image[self.grid == 0] = [255, 255, 255]
+        image[self.grid != 1] = [255, 255, 255]
         image[self.grid == 1] = [0, 0, 0]
         if S:
             image[S] = [50, 168, 64]
@@ -258,6 +262,7 @@ class grid:
         plt.show()
 
 
+# -----------------------------------------------------------------------------
 class pathfinder:
 
     def __init__(self, S, F, grid, c, h):
@@ -266,6 +271,7 @@ class pathfinder:
         self.grid = grid
         self.cost = c
         self.heuristic = h
+        self.expanded_nodes = set()
         #for visualization
         self.vis = visualization(S, F)
         self.path = []
@@ -298,7 +304,6 @@ class pathfinder:
         g_score = {self.S: 0}
         f_score = {self.S: heuristic_fun(self.S, self.F)}
         frontier = [(f_score[self.S], self.S)]
-        expanded_nodes = set()
         parent = {}
 
         while frontier:
@@ -312,34 +317,65 @@ class pathfinder:
                 self.path.append(current)
                 return True
 
-            expanded_nodes.add(current)
+            self.expanded_nodes.add(current)
 
             for neighbor in get_neighbors(current):
-                tentative_g_score = g_score[current] + heuristic_fun(current, neighbor)
+                tentative_g_score = g_score[current] + self.grid.grid[neighbor] * self.cost(current, neighbor)
 
-                if neighbor in expanded_nodes and tentative_g_score >= g_score.get(neighbor, 0):
+                if neighbor in self.expanded_nodes and tentative_g_score >= g_score.get(neighbor, 0):
                     continue
                 if tentative_g_score < g_score.get(neighbor, 0) or neighbor not in [i[1] for i in frontier]:
                     parent[neighbor] = current
                     g_score[neighbor] = tentative_g_score
                     f_score[neighbor] = tentative_g_score + heuristic_fun(neighbor, self.F)
                     frontier.append((f_score[neighbor], neighbor))
-            pf.vis.draw_step(map, [i[1] for i in frontier], expanded_nodes)
         return False
 
     def get_path(self):
         return self.path
 
 
-N = 100
-S = (5, 9)
-F = (95, 85)
+# -----------------------------------------------------------------------------
 
-map = grid(N, S, F)
-pf = pathfinder(S, F, map, lambda x, y: 1, lambda x, y: 0)
-map.draw_map(S, F, pf.get_path())
-pf.vis.add_path(pf.get_path())
+e = 10**(-26)
+uniform = lambda: random.uniform(0 + e, 1 - e)
+triangular = lambda: random.triangular(0 + e, 1 - e)
+betavariate = lambda: random.betavariate(0 + e, 1 - e)
 
-#καλούμε την μέθοδο για να παρουσιάσουμε το animation στο Notebook
-# pf.vis.save_gif("mygif.gif")
-pf.vis.show_gif(fps = 1)
+plt.style.use('seaborn')
+fig, (ax1, ax2) = plt.subplots(1, 2)
+ax1.set_xlabel("Maze Size")
+ax1.set_ylabel("Path length")
+ax2.set_xlabel("Maze Size")
+ax2.set_ylabel("Number of expanded nodes")
+
+fig.suptitle('Different distributions and heuristics')
+
+mazes = []
+for i in range(10):
+    N = random.randint(5, 100)
+    S = (random.randint(2, N - 1), random.randint(2, N - 1))
+    F = (random.randint(2, N - 1), random.randint(2, N - 1))
+    mazes.append((N, S, F))
+mazes.sort(key=lambda x: x[0])
+for distribution, distribution_str in [(uniform, "uniform"), (triangular, "triangular"), (betavariate, "betavariate")]:
+    for heuristic in ["euclidean", "manhattan"]:
+        size = []
+        path = []
+        expanded_nodes = []
+        for N, S, F in mazes:
+            map = grid(N, S, F, distribution)
+            pf = pathfinder(S, F, map, lambda x, y: 1, lambda x, y: 1)
+            if heuristic == "euclidean":
+                pf.find_path(pf.euclidean)
+            elif heuristic == "manhattan":
+                pf.find_path(pf.manhattan)
+
+            size.append(N)
+            path.append(len(pf.get_path()))
+            expanded_nodes.append(len(pf.expanded_nodes))
+        ax1.plot(size, path, label="{}- {}".format(distribution_str, heuristic))
+        ax2.plot(size, expanded_nodes, label="{}- {}".format(distribution_str, heuristic))
+handles, labels = ax2.get_legend_handles_labels()
+fig.legend(handles, labels, loc='upper left')
+plt.show()
