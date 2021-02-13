@@ -9,3 +9,6 @@ In this excercise I implement an A* algorithm with variable heuristics and I vis
 
 ## Prog 2
 In this excercise I implement a simple movie recommender using python and prolog
+
+## Prog 3
+In the last excercise I compare different classification algorithms by using the digits MNIST dataset. I implement classifiers as the KNN, Naive Bayes and a Perceptron and compare them by themselves and by those given by sklearn library.
